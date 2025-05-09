@@ -6,7 +6,7 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => {}, resetTrigger }) => {
 
   useEffect(() => {
     setOtp(new Array(length).fill(""));
-    inputRefs.current[0]?.focus(); // Focus on the first input after reset
+    inputRefs.current[0]?.focus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetTrigger]);
 
