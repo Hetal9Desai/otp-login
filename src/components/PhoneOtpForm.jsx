@@ -9,10 +9,11 @@ const PhoneOtpForm = () => {
   const [otpError, setOtpError] = useState(null);
   const [generatedOtp, setGeneratedOtp] = useState(null);
   const [otpResetCounter, setOtpResetCounter] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     let countdown;
-    if (showOtpInput && timer > 0) {
+    if (showOtpInput && timer > 0 && !isLoggedIn) {
       countdown = setInterval(() => {
         setTimer((prevTimer) => prevTimer - 1);
       }, 1000);
@@ -20,7 +21,7 @@ const PhoneOtpForm = () => {
       setIsOtpExpired(true);
     }
     return () => clearInterval(countdown);
-  }, [showOtpInput, timer]);
+  }, [showOtpInput, timer, isLoggedIn]);
 
   const handlePhoneNumber = (event) => {
     setPhoneNumber(event.target.value);
@@ -28,7 +29,6 @@ const PhoneOtpForm = () => {
 
   const handlePhoneSubmit = (event) => {
     event.preventDefault();
-
     const regex = /[^0-9]/g;
     if (phoneNumber.length < 10 || regex.test(phoneNumber)) {
       alert("Invalid Phone Number");
@@ -49,6 +49,7 @@ const PhoneOtpForm = () => {
     setTimer(60);
     setIsOtpExpired(false);
     setOtpError(null);
+    setIsLoggedIn(false);
     setOtpResetCounter((prev) => prev + 1);
     generateOtp();
     console.log("Resending OTP to", phoneNumber);
@@ -58,6 +59,7 @@ const PhoneOtpForm = () => {
     if (otp === generatedOtp) {
       alert("Login Successful");
       setOtpError(null);
+      setIsLoggedIn(true);
     } else {
       setOtpError("Invalid OTP. Please try again.");
     }
@@ -86,7 +88,9 @@ const PhoneOtpForm = () => {
 
           {otpError && <p className="error">{otpError}</p>}
 
-          {isOtpExpired ? (
+          {isLoggedIn ? (
+            <p>Login Successful</p>
+          ) : isOtpExpired ? (
             <div>
               <button onClick={handleResendOtp} className="resend-otp-btn">
                 Resend OTP

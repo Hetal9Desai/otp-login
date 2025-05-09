@@ -7,43 +7,46 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => {}, resetTrigger }) => {
   useEffect(() => {
     setOtp(new Array(length).fill(""));
     inputRefs.current[0]?.focus();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetTrigger]);
+  }, [resetTrigger, length]);
 
   useEffect(() => {
     if (otp.every((digit) => digit !== "")) {
-      const combinedOtp = otp.join("");
-      setTimeout(() => {
-        onOtpSubmit(combinedOtp);
-      }, 0);
+      onOtpSubmit(otp.join(""));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [otp]);
+  }, [otp, onOtpSubmit]);
 
-  const handleChange = (index, e) => {
-    const value = e.target.value;
-    if (isNaN(value)) return;
+  const handleInput = (index, e) => {
+    const value = e.nativeEvent.data ?? e.target.value;
+
+    // Allow only one digit
+    if (!/^\d$/.test(value)) return;
 
     const newOtp = [...otp];
-    newOtp[index] = value.slice(-1);
+    newOtp[index] = value;
     setOtp(newOtp);
 
-    if (value && index < length - 1) {
+    // Focus on next field after typing
+    if (index < length - 1) {
       inputRefs.current[index + 1]?.focus();
     }
   };
 
-  const handleClick = (index) => {
-    if (index > 0 && !otp[index - 1]) {
-      inputRefs.current[otp.indexOf("")]?.focus();
-    } else {
-      inputRefs.current[index].setSelectionRange(1, 1);
+  const handleKeyDown = (index, e) => {
+    if (e.key === "Backspace") {
+      const newOtp = [...otp];
+      newOtp[index] = "";
+      setOtp(newOtp);
+
+      if (index > 0) {
+        inputRefs.current[index - 1]?.focus();
+      }
     }
   };
 
-  const handleKeyDown = (index, e) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
+  const handleClick = (index) => {
+    // Allow typing over the existing value without clearing
+    if (otp[index]) {
+      inputRefs.current[index]?.setSelectionRange(0, 1);
     }
   };
 
@@ -56,15 +59,16 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => {}, resetTrigger }) => {
         justifyContent: "center",
       }}
     >
-      {otp.map((value, index) => (
+      {otp.map((digit, index) => (
         <input
           key={index}
           type="text"
+          inputMode="numeric"
           maxLength="1"
-          value={value}
-          onChange={(e) => handleChange(index, e)}
-          onClick={() => handleClick(index)}
+          value={digit}
+          onInput={(e) => handleInput(index, e)}
           onKeyDown={(e) => handleKeyDown(index, e)}
+          onClick={() => handleClick(index)}
           ref={(el) => (inputRefs.current[index] = el)}
           style={{
             width: "40px",
