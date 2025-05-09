@@ -8,7 +8,7 @@ const PhoneOtpForm = () => {
   const [isOtpExpired, setIsOtpExpired] = useState(false);
   const [otpError, setOtpError] = useState(null);
   const [generatedOtp, setGeneratedOtp] = useState(null);
-  const [otpResetCounter, setOtpResetCounter] = useState(0); // State to trigger OTP reset
+  const [otpResetCounter, setOtpResetCounter] = useState(0);
 
   useEffect(() => {
     let countdown;
@@ -39,9 +39,10 @@ const PhoneOtpForm = () => {
     generateOtp();
   };
 
+  // Function to generate a random 4-digit OTP
   const generateOtp = () => {
-    const otp = "1234";
-    setGeneratedOtp(otp);
+    const otp = Math.floor(1000 + Math.random() * 9000); // Generate a random 4-digit OTP
+    setGeneratedOtp(otp.toString());
     alert(`Your OTP is: ${otp}`);
   };
 
@@ -50,7 +51,7 @@ const PhoneOtpForm = () => {
     setIsOtpExpired(false);
     setOtpError(null);
     setOtpResetCounter((prev) => prev + 1);
-    generateOtp();
+    generateOtp(); // Generate new OTP when resent
     console.log("Resending OTP to", phoneNumber);
   };
 
