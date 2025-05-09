@@ -1,18 +1,18 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import OtpInput from "./OtpInput";
 
 const PhoneOtpForm = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showOtpInput, setShowOtpInput] = useState(false);
 
-  const handlePhoneNumberChange = (event) => {
+  const handlePhoneNumber = (event) => {
     setPhoneNumber(event.target.value);
   };
 
   const handlePhoneSubmit = (event) => {
     event.preventDefault();
-    console.log("Phone submitted:", phoneNumber);
 
-    // Phone number validation: only digits, and minimum 10 characters
+    // phone validations
     const regex = /[^0-9]/g;
     if (phoneNumber.length < 10 || regex.test(phoneNumber)) {
       alert("Invalid Phone Number");
@@ -20,7 +20,10 @@ const PhoneOtpForm = () => {
     }
 
     setShowOtpInput(true);
-    alert("Phone number is valid. Proceeding...");
+  };
+
+  const onOtpSubmit = (otp) => {
+    console.log("Login Successful", otp);
   };
 
   return (
@@ -30,7 +33,7 @@ const PhoneOtpForm = () => {
           <input
             type="text"
             value={phoneNumber}
-            onChange={handlePhoneNumberChange}
+            onChange={handlePhoneNumber}
             placeholder="Enter Phone Number"
           />
           <button type="submit">Submit</button>
@@ -38,6 +41,7 @@ const PhoneOtpForm = () => {
       ) : (
         <div>
           <p>Enter OTP sent to {phoneNumber}</p>
+          <OtpInput length={4} onOtpSubmit={onOtpSubmit} />
         </div>
       )}
     </div>
