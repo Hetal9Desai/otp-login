@@ -15,3 +15,6 @@ OTP Validation: The OTP entered by the user is validated against a pre-defined O
 Error Handling: If the user enters an incorrect OTP, an error message is displayed.
 
 Responsive Design: The app is designed to work well on both mobile and desktop screens.
+
+## Deploy Link :
+https://wonderful-gumption-75c393.netlify.app/
