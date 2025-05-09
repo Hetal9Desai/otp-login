@@ -1,9 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import OtpInput from "./OtpInput";
 
 const PhoneOtpForm = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showOtpInput, setShowOtpInput] = useState(false);
+  const [timer, setTimer] = useState(60);
+  const [isOtpExpired, setIsOtpExpired] = useState(false);
+  const [otpError, setOtpError] = useState(null);
+  const [generatedOtp, setGeneratedOtp] = useState(null);
+
+  useEffect(() => {
+    let countdown;
+    if (showOtpInput && timer > 0) {
+      countdown = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    } else if (timer === 0) {
+      setIsOtpExpired(true);
+    }
+    return () => clearInterval(countdown);
+  }, [showOtpInput, timer]);
 
   const handlePhoneNumber = (event) => {
     setPhoneNumber(event.target.value);
@@ -12,7 +28,6 @@ const PhoneOtpForm = () => {
   const handlePhoneSubmit = (event) => {
     event.preventDefault();
 
-    // phone validations
     const regex = /[^0-9]/g;
     if (phoneNumber.length < 10 || regex.test(phoneNumber)) {
       alert("Invalid Phone Number");
@@ -20,10 +35,30 @@ const PhoneOtpForm = () => {
     }
 
     setShowOtpInput(true);
+    generateOtp();
+  };
+
+  const generateOtp = () => {
+    const otp = "1234";
+    setGeneratedOtp(otp);
+    alert(`Your OTP is: ${otp}`);
+  };
+
+  const handleResendOtp = () => {
+    setTimer(60);
+    setIsOtpExpired(false);
+    setOtpError(null);
+    generateOtp();
+    console.log("Resending OTP to", phoneNumber);
   };
 
   const onOtpSubmit = (otp) => {
-    console.log("Login Successful", otp);
+    if (otp === generatedOtp) {
+      alert("Login Successful");
+      setOtpError(null);
+    } else {
+      setOtpError("Invalid OTP. Please try again.");
+    }
   };
 
   return (
@@ -42,6 +77,20 @@ const PhoneOtpForm = () => {
         <div>
           <p>Enter OTP sent to {phoneNumber}</p>
           <OtpInput length={4} onOtpSubmit={onOtpSubmit} />
+
+          {otpError && <p className="error">{otpError}</p>}
+
+          {isOtpExpired ? (
+            <div>
+              <button onClick={handleResendOtp} className="resend-otp-btn">
+                Resend OTP
+              </button>
+
+              <p>OTP expired. Please request a new OTP.</p>
+            </div>
+          ) : (
+            <p>OTP expires in {timer} seconds</p>
+          )}
         </div>
       )}
     </div>
