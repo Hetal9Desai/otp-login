@@ -5,7 +5,9 @@ function App() {
   return (
     <div className="App">
       <h1>Login With Phone</h1>
-      <PhoneOtpForm />
+      <div className="card">
+        <PhoneOtpForm />
+      </div>
     </div>
   );
 }
