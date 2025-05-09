@@ -1,12 +1,17 @@
-# React + Vite
+## Phone OTP Login React App
+This is a React-based application that demonstrates a phone number verification flow using OTP (One-Time Password). It includes phone number input, OTP input, OTP timer, error handling for invalid OTP, and the ability to resend OTP when expired.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Features
+Phone Number Input: Allows users to enter their phone numbers to initiate the OTP process.
 
-Currently, two official plugins are available:
+OTP Input Fields: Once the phone number is validated, OTP input fields appear, where users can enter the OTP sent to their phone.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+OTP Timer: The OTP expires after a set time (60 seconds), and a countdown timer is shown.
 
-## Expanding the ESLint configuration
+Resend OTP: Users can request to resend the OTP if the timer expires.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+OTP Validation: The OTP entered by the user is validated against a pre-defined OTP.
+
+Error Handling: If the user enters an incorrect OTP, an error message is displayed.
+
+Responsive Design: The app is designed to work well on both mobile and desktop screens.
