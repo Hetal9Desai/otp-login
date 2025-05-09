@@ -48,7 +48,14 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => {}, resetTrigger }) => {
   };
 
   return (
-    <div style={{ display: "flex", gap: "10px" }}>
+    <div
+      style={{
+        display: "flex",
+        gap: "10px",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       {otp.map((value, index) => (
         <input
           key={index}
