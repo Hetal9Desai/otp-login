@@ -1,19 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 
-const OtpInput = ({ length = 4, onOtpSubmit = () => {} }) => {
+const OtpInput = ({ length = 4, onOtpSubmit = () => {}, resetTrigger }) => {
   const [otp, setOtp] = useState(new Array(length).fill(""));
   const inputRefs = useRef([]);
 
   useEffect(() => {
-    if (inputRefs.current[0]) {
-      inputRefs.current[0].focus();
-    }
-  }, []);
+    setOtp(new Array(length).fill(""));
+    inputRefs.current[0]?.focus(); // Focus on the first input after reset
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetTrigger]);
 
   useEffect(() => {
     if (otp.every((digit) => digit !== "")) {
       const combinedOtp = otp.join("");
-      // Use setTimeout to let the browser render the final digit before alert
       setTimeout(() => {
         onOtpSubmit(combinedOtp);
       }, 0);
@@ -26,31 +25,25 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => {} }) => {
     if (isNaN(value)) return;
 
     const newOtp = [...otp];
-    newOtp[index] = value.substring(value.length - 1);
+    newOtp[index] = value.slice(-1);
     setOtp(newOtp);
 
-    // Move focus to next input
-    if (value && index < length - 1 && inputRefs.current[index + 1]) {
-      inputRefs.current[index + 1].focus();
+    if (value && index < length - 1) {
+      inputRefs.current[index + 1]?.focus();
     }
   };
 
   const handleClick = (index) => {
-    inputRefs.current[index].setSelectionRange(1, 1);
-
     if (index > 0 && !otp[index - 1]) {
-      inputRefs.current[otp.indexOf("")].focus();
+      inputRefs.current[otp.indexOf("")]?.focus();
+    } else {
+      inputRefs.current[index].setSelectionRange(1, 1);
     }
   };
 
   const handleKeyDown = (index, e) => {
-    if (
-      e.key === "Backspace" &&
-      !otp[index] &&
-      index > 0 &&
-      inputRefs.current[index - 1]
-    ) {
-      inputRefs.current[index - 1].focus();
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
     }
   };
 
@@ -61,17 +54,16 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => {} }) => {
           key={index}
           type="text"
           maxLength="1"
-          ref={(input) => (inputRefs.current[index] = input)}
           value={value}
           onChange={(e) => handleChange(index, e)}
           onClick={() => handleClick(index)}
           onKeyDown={(e) => handleKeyDown(index, e)}
-          className="otpInput"
+          ref={(el) => (inputRefs.current[index] = el)}
           style={{
             width: "40px",
             height: "40px",
-            fontSize: "24px",
             textAlign: "center",
+            fontSize: "24px",
           }}
         />
       ))}

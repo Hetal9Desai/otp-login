@@ -8,6 +8,7 @@ const PhoneOtpForm = () => {
   const [isOtpExpired, setIsOtpExpired] = useState(false);
   const [otpError, setOtpError] = useState(null);
   const [generatedOtp, setGeneratedOtp] = useState(null);
+  const [otpResetCounter, setOtpResetCounter] = useState(0); // State to trigger OTP reset
 
   useEffect(() => {
     let countdown;
@@ -48,6 +49,7 @@ const PhoneOtpForm = () => {
     setTimer(60);
     setIsOtpExpired(false);
     setOtpError(null);
+    setOtpResetCounter((prev) => prev + 1);
     generateOtp();
     console.log("Resending OTP to", phoneNumber);
   };
@@ -76,7 +78,11 @@ const PhoneOtpForm = () => {
       ) : (
         <div>
           <p>Enter OTP sent to {phoneNumber}</p>
-          <OtpInput length={4} onOtpSubmit={onOtpSubmit} />
+          <OtpInput
+            length={4}
+            onOtpSubmit={onOtpSubmit}
+            resetTrigger={otpResetCounter}
+          />
 
           {otpError && <p className="error">{otpError}</p>}
 
@@ -85,7 +91,6 @@ const PhoneOtpForm = () => {
               <button onClick={handleResendOtp} className="resend-otp-btn">
                 Resend OTP
               </button>
-
               <p>OTP expired. Please request a new OTP.</p>
             </div>
           ) : (
