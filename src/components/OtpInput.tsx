@@ -68,10 +68,17 @@ const OtpInput: React.FC<OtpInputProps> = ({
     }
   };
 
-  const handleClick = (idx: number) => {
-    const firstEmpty = otp.findIndex((d) => d === "");
-    const focusIdx = firstEmpty !== -1 && firstEmpty < idx ? firstEmpty : idx;
-    inputRefs.current[focusIdx]?.focus();
+  const handleClick = (idx: number, e: React.MouseEvent) => {
+    const focusIdx = idx;
+
+    if (e.shiftKey && focusIdx > 0) {
+      inputRefs.current[focusIdx - 1]?.focus();
+    } else if (e.ctrlKey && focusIdx < length - 1) {
+      inputRefs.current[focusIdx + 1]?.focus();
+    } else {
+      inputRefs.current[focusIdx]?.focus();
+    }
+
     inputRefs.current[focusIdx]?.select();
   };
 
@@ -82,7 +89,7 @@ const OtpInput: React.FC<OtpInputProps> = ({
           key={i}
           value={digit}
           onChange={(e) => handleChange(i, e.target.value.slice(-1))}
-          onClick={() => handleClick(i)}
+          onClick={(e) => handleClick(i, e)}
           inputRef={(el) => (inputRefs.current[i] = el)}
           inputProps={{
             maxLength: 1,
