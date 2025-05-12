@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, CssBaseline, Typography } from "@mui/material";
 import PhoneOtpForm from "./components/PhoneOtpForm";
 
