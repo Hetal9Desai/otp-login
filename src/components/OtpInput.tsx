@@ -16,20 +16,17 @@ const OtpInput: React.FC<OtpInputProps> = ({
 }) => {
   const [otp, setOtp] = useState<string[]>(Array.from({ length }, () => ""));
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
-  const prevOtpRef = useRef("");
 
   useEffect(() => {
     setOtp(Array.from({ length }, () => ""));
     inputRefs.current = inputRefs.current.slice(0, length);
-    prevOtpRef.current = "";
     inputRefs.current[0]?.focus();
   }, [resetTrigger, length]);
 
   useEffect(() => {
     const code = otp.join("");
-    if (code.length === length && code !== prevOtpRef.current) {
-      prevOtpRef.current = code;
-      setTimeout(() => onOtpSubmit(code), 0);
+    if (code.length === length) {
+      onOtpSubmit(code);
     }
   }, [otp, length, onOtpSubmit]);
 
@@ -39,7 +36,13 @@ const OtpInput: React.FC<OtpInputProps> = ({
     updated[idx] = value;
     setOtp(updated);
     onChange();
-    if (idx < length - 1) inputRefs.current[idx + 1]?.focus();
+
+    if (idx < length - 1) {
+      setTimeout(() => {
+        inputRefs.current[idx + 1]?.focus();
+        inputRefs.current[idx + 1]?.select();
+      }, 0);
+    }
   };
 
   const handleKeyDown = (
@@ -68,18 +71,8 @@ const OtpInput: React.FC<OtpInputProps> = ({
     }
   };
 
-  const handleClick = (idx: number, e: React.MouseEvent) => {
-    const focusIdx = idx;
-
-    if (e.shiftKey && focusIdx > 0) {
-      inputRefs.current[focusIdx - 1]?.focus();
-    } else if (e.ctrlKey && focusIdx < length - 1) {
-      inputRefs.current[focusIdx + 1]?.focus();
-    } else {
-      inputRefs.current[focusIdx]?.focus();
-    }
-
-    inputRefs.current[focusIdx]?.select();
+  const handleClick = (idx: number) => {
+    inputRefs.current[idx]?.select();
   };
 
   return (
@@ -89,7 +82,7 @@ const OtpInput: React.FC<OtpInputProps> = ({
           key={i}
           value={digit}
           onChange={(e) => handleChange(i, e.target.value.slice(-1))}
-          onClick={(e) => handleClick(i, e)}
+          onClick={() => handleClick(i)}
           inputRef={(el) => (inputRefs.current[i] = el)}
           inputProps={{
             maxLength: 1,
