@@ -1,7 +1,9 @@
 ## Phone OTP Login React App
+
 This is a React-based application that demonstrates a phone number verification flow using OTP (One-Time Password). It includes phone number input, OTP input, OTP timer, error handling for invalid OTP, and the ability to resend OTP when expired.
 
 ## Features
+
 Phone Number Input: Allows users to enter their phone numbers to initiate the OTP process.
 
 OTP Input Fields: Once the phone number is validated, OTP input fields appear, where users can enter the OTP sent to their phone.
@@ -16,5 +18,14 @@ Error Handling: If the user enters an incorrect OTP, an error message is display
 
 Responsive Design: The app is designed to work well on both mobile and desktop screens.
 
+## Technologies Used
+
+    React
+
+    TypeScript
+
+    MUI
+
 ## Deploy Link :
+
 https://wonderful-gumption-75c393.netlify.app/

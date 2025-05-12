@@ -1,11 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Box, TextField } from "@mui/material";
 
-const OtpInput = ({ length = 4, onOtpSubmit = () => {}, resetTrigger }) => {
-  const [otp, setOtp] = useState(() => Array.from({ length }, () => ""));
-  const inputRefs = useRef([]);
+interface OtpInputProps {
+  length?: number;
+  onOtpSubmit?: (otp: string) => void;
+  resetTrigger?: number;
+  onChange?: () => void;
+}
+
+const OtpInput: React.FC<OtpInputProps> = ({
+  length = 4,
+  onOtpSubmit = () => {},
+  resetTrigger = 0,
+  onChange = () => {},
+}) => {
+  const [otp, setOtp] = useState<string[]>(Array.from({ length }, () => ""));
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const prevOtpRef = useRef("");
 
-  // Reset on trigger or length change
   useEffect(() => {
     setOtp(Array.from({ length }, () => ""));
     inputRefs.current = inputRefs.current.slice(0, length);
@@ -13,7 +25,6 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => {}, resetTrigger }) => {
     inputRefs.current[0]?.focus();
   }, [resetTrigger, length]);
 
-  // Fire callback once, after last digit renders
   useEffect(() => {
     const code = otp.join("");
     if (code.length === length && code !== prevOtpRef.current) {
@@ -22,80 +33,66 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => {}, resetTrigger }) => {
     }
   }, [otp, length, onOtpSubmit]);
 
-  const handleChange = (idx, e) => {
-    const val = e.target.value.trim();
-    if (!/^\d$/.test(val)) return;
-    const next = [...otp];
-    next[idx] = val;
-    setOtp(next);
-    // auto-advance
+  const handleChange = (idx: number, value: string) => {
+    if (!/^\d$/.test(value)) return;
+    const updated = [...otp];
+    updated[idx] = value;
+    setOtp(updated);
+    onChange();
     if (idx < length - 1) inputRefs.current[idx + 1]?.focus();
   };
 
-  const handleKeyDown = (idx, e) => {
-    const key = e.key;
-    if (key === "Backspace") {
-      e.preventDefault();
-      const next = [...otp];
+  const handleKeyDown = (
+    idx: number,
+    e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    if (e.key === "Backspace") {
       if (otp[idx]) {
-        // clear current
-        next[idx] = "";
-        setOtp(next);
+        const updated = [...otp];
+        updated[idx] = "";
+        setOtp(updated);
       } else if (idx > 0) {
-        // go back one and clear
         inputRefs.current[idx - 1]?.focus();
-        next[idx - 1] = "";
-        setOtp(next);
+        const updated = [...otp];
+        updated[idx - 1] = "";
+        setOtp(updated);
       }
-    } else if (key === "ArrowLeft") {
+    } else if (e.key === "ArrowLeft" && idx > 0) {
       e.preventDefault();
-      if (idx > 0) inputRefs.current[idx - 1]?.focus();
-    } else if (key === "ArrowRight") {
+      inputRefs.current[idx - 1]?.focus();
+      inputRefs.current[idx - 1]?.select();
+    } else if (e.key === "ArrowRight" && idx < length - 1) {
       e.preventDefault();
-      if (idx < length - 1) inputRefs.current[idx + 1]?.focus();
-    } else if (key === "Enter") {
-      const code = otp.join("");
-      if (code.length === length) onOtpSubmit(code);
+      inputRefs.current[idx + 1]?.focus();
+      inputRefs.current[idx + 1]?.select();
     }
   };
 
-  const handleClick = (idx) => {
-    // if there's an earlier empty slot, jump there:
+  const handleClick = (idx: number) => {
     const firstEmpty = otp.findIndex((d) => d === "");
-    const target = firstEmpty !== -1 && firstEmpty < idx ? firstEmpty : idx;
-    inputRefs.current[target]?.focus();
-    inputRefs.current[target]?.select();
-  };
-
-  const handleFocus = (e) => {
-    // select existing digit so typing overwrites
-    e.target.select();
+    const focusIdx = firstEmpty !== -1 && firstEmpty < idx ? firstEmpty : idx;
+    inputRefs.current[focusIdx]?.focus();
+    inputRefs.current[focusIdx]?.select();
   };
 
   return (
-    <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+    <Box display="flex" justifyContent="center" gap={1}>
       {otp.map((digit, i) => (
-        <input
+        <TextField
           key={i}
-          type="text"
-          inputMode="numeric"
-          maxLength={1}
           value={digit}
-          onChange={(e) => handleChange(i, e)}
-          onKeyDown={(e) => handleKeyDown(i, e)}
+          onChange={(e) => handleChange(i, e.target.value.slice(-1))}
           onClick={() => handleClick(i)}
-          onFocus={handleFocus}
-          ref={(el) => (inputRefs.current[i] = el)}
-          className="otpInput"
-          style={{
-            width: 40,
-            height: 40,
-            textAlign: "center",
-            fontSize: 24,
+          inputRef={(el) => (inputRefs.current[i] = el)}
+          inputProps={{
+            maxLength: 1,
+            style: { textAlign: "center", fontSize: "1.5rem" },
+            onKeyDown: (e) => handleKeyDown(i, e),
           }}
+          size="small"
         />
       ))}
-    </div>
+    </Box>
   );
 };
 
