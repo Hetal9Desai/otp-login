@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import OtpInput from "./OtpInput";
 
 const PhoneOtpForm = () => {
@@ -14,34 +14,28 @@ const PhoneOtpForm = () => {
   useEffect(() => {
     let countdown;
     if (showOtpInput && timer > 0 && !isLoggedIn) {
-      countdown = setInterval(() => {
-        setTimer((prevTimer) => prevTimer - 1);
-      }, 1000);
+      countdown = setInterval(() => setTimer((t) => t - 1), 1000);
     } else if (timer === 0) {
       setIsOtpExpired(true);
     }
     return () => clearInterval(countdown);
   }, [showOtpInput, timer, isLoggedIn]);
 
-  const handlePhoneNumber = (event) => {
-    setPhoneNumber(event.target.value);
-  };
+  const handlePhoneNumber = (e) => setPhoneNumber(e.target.value);
 
-  const handlePhoneSubmit = (event) => {
-    event.preventDefault();
-    const regex = /[^0-9]/g;
-    if (phoneNumber.length < 10 || regex.test(phoneNumber)) {
+  const handlePhoneSubmit = (e) => {
+    e.preventDefault();
+    if (phoneNumber.length < 10 || /[^0-9]/.test(phoneNumber)) {
       alert("Invalid Phone Number");
       return;
     }
-
     setShowOtpInput(true);
     generateOtp();
   };
 
   const generateOtp = () => {
-    const otp = Math.floor(1000 + Math.random() * 9000);
-    setGeneratedOtp(otp.toString());
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    setGeneratedOtp(otp);
     alert(`Your OTP is: ${otp}`);
   };
 
@@ -50,20 +44,42 @@ const PhoneOtpForm = () => {
     setIsOtpExpired(false);
     setOtpError(null);
     setIsLoggedIn(false);
-    setOtpResetCounter((prev) => prev + 1);
+    setOtpResetCounter((c) => c + 1);
     generateOtp();
-    console.log("Resending OTP to", phoneNumber);
   };
 
-  const onOtpSubmit = (otp) => {
-    if (otp === generatedOtp) {
-      alert("Login Successful");
+  const onOtpSubmit = (entered) => {
+    if (entered === generatedOtp) {
       setOtpError(null);
       setIsLoggedIn(true);
     } else {
       setOtpError("Invalid OTP. Please try again.");
     }
   };
+
+  if (isLoggedIn) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "2rem",
+        }}
+      >
+        <div
+          style={{
+            background: "#fff",
+            padding: "2rem 3rem",
+            borderRadius: "8px",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
+            textAlign: "center",
+          }}
+        >
+          <h2 style={{ margin: 0 }}>Login Successful!</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -85,12 +101,9 @@ const PhoneOtpForm = () => {
             onOtpSubmit={onOtpSubmit}
             resetTrigger={otpResetCounter}
           />
-
           {otpError && <p className="error">{otpError}</p>}
 
-          {isLoggedIn ? (
-            <p>Login Successful</p>
-          ) : isOtpExpired ? (
+          {isOtpExpired ? (
             <div>
               <button onClick={handleResendOtp} className="resend-otp-btn">
                 Resend OTP
